@@ -94,18 +94,6 @@ router.delete('/:pid', async (req,res)=>{
         }
     }catch{}    
 })
-
-
-
-
-
-
-
-
-
-
-
-
 router.delete('/:pid', (req,res)=>{
     const {pid}  = req.params;
     const productIndex = products.findIndex(product => product.id === parseInt(pid));
