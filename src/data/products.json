@@ -1,0 +1,44 @@
+[
+  {
+    "id": 3,
+    "title": "Laptop Gaming RTX",
+    "description": "Laptop para juegos con procesador Intel i7, 16GB RAM y tarjeta gráfica RTX 3080.",
+    "code": "LPTGRTX123",
+    "price": 1799.99,
+    "status": true,
+    "stock": 5,
+    "category": "Computadoras",
+    "thumbnails": [
+      "/images/products/laptop_gaming_front.jpg",
+      "/images/products/laptop_gaming_side.jpg"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Cámara DSLR 24MP",
+    "description": "Cámara digital réflex de 24 megapíxeles con lente 18-55mm.",
+    "code": "CAMDSLR789",
+    "price": 999.99,
+    "status": true,
+    "stock": 15,
+    "category": "Fotografía",
+    "thumbnails": [
+      "/images/products/camara_dslr_front.jpg",
+      "/images/products/camara_dslr_side.jpg"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Smartphone 5G",
+    "description": "Smartphone con pantalla AMOLED de 6.7 pulgadas y conectividad 5G.",
+    "code": "SP5G1234",
+    "price": 899.99,
+    "status": true,
+    "stock": 20,
+    "category": "Telefonía",
+    "thumbnails": [
+      "/images/products/smartphone_5g_front.jpg",
+      "/images/products/smartphone_5g_side.jpg"
+    ]
+  }
+]
