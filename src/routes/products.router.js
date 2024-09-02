@@ -3,11 +3,14 @@ const router= express.Router();
 const {read_file, write_file}= require('../services/fs');
 
 router.get('/', async (req,res)=>{
-    const data_products = await read_file('products.json');
-    if (data_products) {
-        res.render('index', {data_products})
-    } else {
-        res.status(500).json({ message: 'Error al leer los productos' });
+    try {
+        const data_products = await read_file('products.json');
+        res.render('index', { 
+            showRealTime: false,
+            data_products: data_products
+        });
+    } catch (error) {
+        res.status(500).send('Error reading products');
     }
 });
 

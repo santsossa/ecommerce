@@ -1,19 +1,5 @@
 [
   {
-    "id": 3,
-    "title": "Laptop Gaming RTX",
-    "description": "Laptop para juegos con procesador Intel i7, 16GB RAM y tarjeta gráfica RTX 3080.",
-    "code": "LPTGRTX123",
-    "price": 1799.99,
-    "status": true,
-    "stock": 5,
-    "category": "Computadoras",
-    "thumbnails": [
-      "/images/products/laptop_gaming_front.jpg",
-      "/images/products/laptop_gaming_side.jpg"
-    ]
-  },
-  {
     "id": 4,
     "title": "Cámara DSLR 24MP",
     "description": "Cámara digital réflex de 24 megapíxeles con lente 18-55mm.",

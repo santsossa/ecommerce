@@ -1,1 +1,5 @@
-{{>products}}
+{{#if showRealTime}}
+        {{> realTimeProducts}}
+    {{else}}
+        {{> products}}
+    {{/if}}
