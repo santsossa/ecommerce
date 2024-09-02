@@ -12,19 +12,5 @@
       "/images/products/camara_dslr_front.jpg",
       "/images/products/camara_dslr_side.jpg"
     ]
-  },
-  {
-    "id": 5,
-    "title": "Smartphone 5G",
-    "description": "Smartphone con pantalla AMOLED de 6.7 pulgadas y conectividad 5G.",
-    "code": "SP5G1234",
-    "price": 899.99,
-    "status": true,
-    "stock": 20,
-    "category": "Telefonía",
-    "thumbnails": [
-      "/images/products/smartphone_5g_front.jpg",
-      "/images/products/smartphone_5g_side.jpg"
-    ]
   }
 ]
