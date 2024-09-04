@@ -1,0 +1,32 @@
+<h1>Detalles del Producto</h1>
+
+<div>
+  <strong>ID:</strong> {{_id}}<br>
+  <strong>Título:</strong> {{title}}<br>
+  <strong>Descripción:</strong> {{description}}<br>
+  <strong>Código:</strong> {{code}}<br>
+  <strong>Precio:</strong> ${{price}}<br>
+  <strong>Estado:</strong> {{#if status}}Disponible{{else}}No disponible{{/if}}<br>
+  <strong>Stock:</strong> {{stock}} unidades<br>
+  <strong>Categoría:</strong> {{category}}<br>
+  <img src="{{thumbnails.[0]}}" alt="{{title}}"><br>
+  <button onclick="addToCart('{{_id}}')">Agregar al carrito</button>
+</div>
+
+<script>
+  function addToCart(productId) {
+    fetch(`/api/carts/YOUR_CART_ID/product/${productId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message);
+    })
+    .catch(error => {
+      console.error('Error al agregar el producto al carrito:', error);
+    });
+  }
+</script>
