@@ -1,29 +1,50 @@
 <h1>Detalles del Producto</h1>
 
-<div>
-  <strong>ID:</strong> {{_id}}<br>
-  <strong>Título:</strong> {{title}}<br>
-  <strong>Descripción:</strong> {{description}}<br>
-  <strong>Código:</strong> {{code}}<br>
-  <strong>Precio:</strong> ${{price}}<br>
-  <strong>Estado:</strong> {{#if status}}Disponible{{else}}No disponible{{/if}}<br>
-  <strong>Stock:</strong> {{stock}} unidades<br>
-  <strong>Categoría:</strong> {{category}}<br>
-  <img src="{{thumbnails.[0]}}" alt="{{title}}"><br>
-  <button onclick="addToCart('{{_id}}')">Agregar al carrito</button>
+<div style="border: 1px solid #ccc; padding: 20px; margin-bottom: 20px;">
+  <strong>ID:</strong> {{product._id}}<br>
+  <strong>Título:</strong> {{product.title}}<br>
+  <strong>Descripción:</strong> {{product.description}}<br>
+  <strong>Código:</strong> {{product.code}}<br>
+  <strong>Precio:</strong> ${{product.price}}<br>
+  <strong>Estado:</strong> {{#if product.status}}Disponible{{else}}No disponible{{/if}}<br>
+  <strong>Stock:</strong> {{product.stock}} unidades<br>
+  <strong>Categoría:</strong> {{product.category}}<br>
+  <strong>Thumbnails:</strong><br>
+  {{#each product.thumbnails}}
+    <img src="{{this}}" alt="Thumbnail" style="max-width: 100px; margin-right: 5px;">
+  {{/each}}
 </div>
+
+<button onclick="addToCart('{{product._id}}')" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; cursor: pointer;">
+  Agregar al carrito
+</button>
+
+<a href="/products" style="margin-top: 20px; display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">
+  Regresar a la Lista de Productos
+</a>
 
 <script>
   function addToCart(productId) {
-    fetch(`/api/carts/YOUR_CART_ID/product/${productId}`, {
+    const cartId = '66d7d8f33866bc78247162e4'; 
+
+    fetch(`/carts/${cartId}/product/${productId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       }
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then(data => {
-      alert(data.message);
+      if (data.success) {
+        alert('Producto agregado al carrito exitosamente!');
+      } else {
+        alert('Hubo un problema al agregar el producto al carrito.');
+      }
     })
     .catch(error => {
       console.error('Error al agregar el producto al carrito:', error);

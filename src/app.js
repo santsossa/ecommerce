@@ -24,6 +24,6 @@ mongoose.connect(process.env.MONGODB_URI).then(()=>{
     console.error('error conectando a MongoDB Atlas:' ,error)
 })
 
-app.use('/api', router);
+app.use(router);
 module.exports= app;
 

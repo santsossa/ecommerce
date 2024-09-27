@@ -2,7 +2,7 @@
 
 <ul>
   {{#each products}}
-    <li>
+    <li style="margin-bottom: 20px; border-bottom: 1px solid #ccc; padding: 10px;">
       <strong>ID:</strong> {{this._id}}<br>
       <strong>Título:</strong> {{this.title}}<br>
       <strong>Descripción:</strong> {{this.description}}<br>
@@ -11,20 +11,206 @@
       <strong>Estado:</strong> {{#if this.status}}Disponible{{else}}No disponible{{/if}}<br>
       <strong>Stock:</strong> {{this.stock}} unidades<br>
       <strong>Categoría:</strong> {{this.category}}<br>
-      <a href="/products/{{this._id}}">Ver detalles</a>
-      <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
+      <img src="{{this.thumbnails.[0]}}" alt="{{this.title}}" style="max-width: 100px;"><br>
+      <a href='/products/{{this._id}}' style="display: inline-block; margin-top: 5px;">Ver detalles</a>
+      <button onclick="addToCart('{{this._id}}')" style="display: inline-block; background-color: #28a745; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
+        Agregar al carrito
+      </button>
+      <button onclick="deleteProduct('{{this._id}}')" style="display: inline-block; background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
+        Eliminar producto
+      </button>
+      <button onclick="showUpdateForm('{{this._id}}', '{{this.title}}', '{{this.description}}', '{{this.code}}', {{this.price}}, {{this.stock}}, '{{this.category}}', '{{this.status}}', '{{this.thumbnails}}')" style="display: inline-block; background-color: #ffc107; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
+        Actualizar producto
+      </button>
     </li>
-    <br>
   {{else}}
     <li>No hay productos disponibles.</li>
   {{/each}}
 </ul>
 
-<div>
-  {{#if hasPrevPage}}
-    <a href="{{prevLink}}">Página anterior</a>
-  {{/if}}
-  {{#if hasNextPage}}
-    <a href="{{nextLink}}">Página siguiente</a>
-  {{/if}}
+<a href="/carts/66d7d8f33866bc78247162e4" style="display: inline-block; margin-top: 20px; background-color: #007bff; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px;">
+  Ver Carrito
+</a>
+
+
+<h2>Agregar Nuevo Producto</h2>
+<form id="addProductForm" onsubmit="addProduct(event)">
+  <label>Título:</label>
+  <input type="text" id="newTitle" required><br>
+  <label>Descripción:</label>
+  <input type="text" id="newDescription" required><br>
+  <label>Código:</label>
+  <input type="text" id="newCode" required><br>
+  <label>Precio:</label>
+  <input type="number" id="newPrice" required><br>
+  <label>Estado:</label>
+  <select id="newStatus" required>
+    <option value="true">Disponible</option>
+    <option value="false">No disponible</option>
+  </select><br>
+  <label>Stock:</label>
+  <input type="number" id="newStock" required><br>
+  <label>Categoría:</label>
+  <input type="text" id="newCategory" required><br>
+  <label>Thumbnails (URLs separadas por coma):</label>
+  <input type="text" id="newThumbnails" required><br>
+  <button type="submit">Agregar Producto</button>
+</form>
+
+<div id="updateForm" style="display:none;">
+  <h2>Actualizar Producto</h2>
+  <form onsubmit="updateProduct(event)">
+    <input type="hidden" id="updateId">
+    <label>Título:</label>
+    <input type="text" id="updateTitle" required><br>
+    <label>Descripción:</label>
+    <input type="text" id="updateDescription" required><br>
+    <label>Código:</label>
+    <input type="text" id="updateCode" required><br>
+    <label>Precio:</label>
+    <input type="number" id="updatePrice" required><br>
+    <label>Estado:</label>
+    <select id="updateStatus" required>
+      <option value="true">Disponible</option>
+      <option value="false">No disponible</option>
+    </select><br>
+    <label>Stock:</label>
+    <input type="number" id="updateStock" required><br>
+    <label>Categoría:</label>
+    <input type="text" id="updateCategory" required><br>
+    <label>Thumbnails (URLs separadas por coma):</label>
+    <input type="text" id="updateThumbnails" required><br>
+    <button type="submit">Actualizar Producto</button>
+    <button type="button" onclick="cancelUpdate()">Cancelar</button>
+  </form>
 </div>
+
+<script>
+  function addToCart(productId) {
+    const cartId = '66d7d8f33866bc78247162e4'; 
+
+    fetch(`/carts/${cartId}/product/${productId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Producto agregado al carrito exitosamente!');
+      } else {
+        alert('Hubo un problema al agregar el producto al carrito.');
+      }
+    })
+    .catch(error => {
+      console.error('Error al agregar el producto al carrito:', error);
+    });
+  }
+
+  function deleteProduct(productId) {
+    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+      fetch(`/products/${productId}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          alert(data.message);
+          location.reload(); 
+        } else {
+          alert('Hubo un problema al eliminar el producto.');
+        }
+      })
+      .catch(error => {
+        console.error('Error al eliminar el producto:', error);
+      });
+    }
+  }
+
+  function showUpdateForm(id, title, description, code, price, stock, category, status, thumbnails) {
+    document.getElementById('updateId').value = id;
+    document.getElementById('updateTitle').value = title;
+    document.getElementById('updateDescription').value = description;
+    document.getElementById('updateCode').value = code;
+    document.getElementById('updatePrice').value = price;
+    document.getElementById('updateStock').value = stock;
+    document.getElementById('updateCategory').value = category;
+    document.getElementById('updateStatus').value = status.toString(); 
+    document.getElementById('updateThumbnails').value = thumbnails; 
+    document.getElementById('updateForm').style.display = 'block';
+  }
+
+  function cancelUpdate() {
+    document.getElementById('updateForm').style.display = 'none';
+  }
+
+  function updateProduct(event) {
+    event.preventDefault();
+    const productId = document.getElementById('updateId').value;
+    const updatedProduct = {
+      title: document.getElementById('updateTitle').value,
+      description: document.getElementById('updateDescription').value,
+      code: document.getElementById('updateCode').value,
+      price: document.getElementById('updatePrice').value,
+      status: document.getElementById('updateStatus').value === 'true', 
+      stock: document.getElementById('updateStock').value,
+      category: document.getElementById('updateCategory').value,
+      thumbnails: document.getElementById('updateThumbnails').value.split(',') 
+    };
+
+    fetch(`/products/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedProduct)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message) {
+        alert(data.message);
+        location.reload(); 
+      } else {
+        alert('Hubo un problema al actualizar el producto.');
+      }
+    })
+    .catch(error => {
+      console.error('Error al actualizar el producto:', error);
+    });
+  }
+
+  function addProduct(event) {
+    event.preventDefault();
+    const newProduct = {
+      title: document.getElementById('newTitle').value,
+      description: document.getElementById('newDescription').value,
+      code: document.getElementById('newCode').value,
+      price: document.getElementById('newPrice').value,
+      status: document.getElementById('newStatus').value === 'true', 
+      stock: document.getElementById('newStock').value,
+      category: document.getElementById('newCategory').value,
+      thumbnails: document.getElementById('newThumbnails').value.split(',') 
+    };
+
+    fetch('/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newProduct)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message) {
+        alert(data.message);
+        location.reload(); 
+      } else {
+        alert('Hubo un problema al agregar el producto.');
+      }
+    })
+    .catch(error => {
+      console.error('Error al agregar el producto:', error);
+    });
+  }
+</script>

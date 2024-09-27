@@ -2,9 +2,8 @@ const socket = io();
 
 socket.on("products", (products)=>{
     const productList = document.getElementById('productList');
-        productList.innerHTML = ''; // Limpiar la lista actual
+        productList.innerHTML = '';
 
-        // Volver a renderizar la lista de productos
         products.forEach(product => {
             const productItem = document.createElement('li');
 
@@ -44,6 +43,5 @@ document.getElementById('addProductForm').addEventListener('submit', (event) => 
         category: document.getElementById('category').value
     };
 
-    // Emitir un evento 'addProduct' al servidor con el nuevo producto
     socket.emit('addProduct', newProduct);
 })

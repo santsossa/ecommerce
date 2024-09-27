@@ -2,30 +2,38 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/products.models');
 
-// Ruta para obtener productos con paginación, filtros y ordenamientos
+
 router.get('/', async (req, res) => {
     try {
         let { limit = 10, page = 1, sort, query } = req.query;
-        limit = parseInt(limit, 10);
-        page = parseInt(page, 10);
+        
 
+        limit = isNaN(limit) || limit <= 0 ? 10 : parseInt(limit, 10);
+        page = isNaN(page) || page <= 0 ? 1 : parseInt(page, 10);
+        
         const filter = {};
+        
         if (query) {
             const lowerCaseQuery = query.toLowerCase();
             filter.$or = [
                 { category: { $regex: lowerCaseQuery, $options: 'i' } },
-                { status: lowerCaseQuery === 'true' }
-            ];
+                { status: lowerCaseQuery === 'true' || lowerCaseQuery === 'false' ? lowerCaseQuery === 'true' : undefined }
+            ].filter(Boolean); 
         }
 
         const options = {
             limit,
             page,
-            sort: sort ? { price: sort === 'asc' ? 1 : -1 } : {}
+            sort: sort ? { price: sort === 'asc' ? 1 : -1 } : {},
+            lean: true 
         };
 
         const products = await Product.paginate(filter, options);
         const { docs, totalPages, prevPage, nextPage, hasPrevPage, hasNextPage } = products;
+
+        const baseUrl = `/products?limit=${limit}`;
+        const queryPart = query ? `&query=${query}` : '';
+        const sortPart = sort ? `&sort=${sort}` : '';
 
         res.render('products', {
             products: docs,
@@ -34,8 +42,8 @@ router.get('/', async (req, res) => {
             nextPage,
             hasPrevPage,
             hasNextPage,
-            prevLink: hasPrevPage ? `/products?limit=${limit}&page=${prevPage}&sort=${sort}&query=${query}` : null,
-            nextLink: hasNextPage ? `/products?limit=${limit}&page=${nextPage}&sort=${sort}&query=${query}` : null
+            prevLink: hasPrevPage ? `${baseUrl}&page=${prevPage}${queryPart}${sortPart}` : null,
+            nextLink: hasNextPage ? `${baseUrl}&page=${nextPage}${queryPart}${sortPart}` : null
         });
     } catch (error) {
         console.error('Error al obtener los productos:', error.message);
@@ -47,10 +55,9 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Ruta para obtener un producto por su ID
 router.get('/:pid', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.pid);
+        const product = await Product.findById(req.params.pid).lean(); 
         if (product) {
             res.render('productDetails', { product });
         } else {
@@ -62,7 +69,6 @@ router.get('/:pid', async (req, res) => {
     }
 });
 
-// Ruta para agregar un nuevo producto
 router.post('/', async (req, res) => {
     try {
         const newProduct = new Product(req.body);
@@ -74,10 +80,10 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Ruta para actualizar un producto por su ID
+
 router.put('/:pid', async (req, res) => {
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(req.params.pid, req.body, { new: true });
+        const updatedProduct = await Product.findByIdAndUpdate(req.params.pid, req.body, { new: true }).lean();
         if (updatedProduct) {
             res.json({ message: 'Producto actualizado con éxito', product: updatedProduct });
         } else {
@@ -89,10 +95,10 @@ router.put('/:pid', async (req, res) => {
     }
 });
 
-// Ruta para eliminar un producto por su ID
+
 router.delete('/:pid', async (req, res) => {
     try {
-        const deletedProduct = await Product.findByIdAndDelete(req.params.pid);
+        const deletedProduct = await Product.findByIdAndDelete(req.params.pid).lean();
         if (deletedProduct) {
             res.json({ message: 'Producto eliminado con éxito' });
         } else {

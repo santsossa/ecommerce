@@ -1,16 +1,124 @@
-<h1>Detalles del Carrito</h1>
+<h1 style="text-align: center;">Detalles del Carrito</h1>
 
-<ul>
-  {{#each products}}
-    <li>
-      <strong>ID del Producto:</strong> {{product_id._id}}<br>
-      <strong>Título:</strong> {{product_id.title}}<br>
-      <strong>Descripción:</strong> {{product_id.description}}<br>
-      <strong>Precio:</strong> ${{product_id.price}}<br>
-      <strong>Cantidad:</strong> {{quantity}}<br>
-    </li>
-    <br>
+<div style="max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+  <h2 style="text-align: center; color: #333;">Información del Carrito</h2>
+  <p><strong>ID del Carrito:</strong> {{cart._id}}</p>
+  <p><strong>Creado en:</strong> {{cart.createdAt}}</p>
+  <p><strong>Actualizado en:</strong> {{cart.updatedAt}}</p>
+
+  {{#if cart.products.length}}
+    <h3 style="color: #555;">Productos en el Carrito</h3>
+    <ul style="list-style: none; padding: 0;">
+      {{#each cart.products}}
+        <li style="margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 5px; background-color: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+          <p style="margin: 0;"><strong>ID del Producto:</strong> {{this.product_id._id}}</p>
+          <p style="margin: 0;"><strong>Cantidad en carrito:</strong>
+            <input type="number" 
+                   value="{{this.quantity}}" 
+                   data-product-id="{{this.product_id._id}}" 
+                   onchange="updateQuantity('{{../cart._id}}', '{{this.product_id._id}}', this.value)" 
+                   min="1" style="width: 60px; margin-left: 10px;">
+          </p>
+          <button onclick="removeProduct('{{../cart._id}}', '{{this.product_id._id}}')" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Eliminar</button>
+        </li>
+      {{/each}}
+    </ul>
   {{else}}
-    <li>El carrito está vacío.</li>
-  {{/each}}
-</ul>
+    <p style="text-align: center; font-size: 18px; color: #666;">No hay productos en el carrito.</p>
+  {{/if}}
+
+  <div style="text-align: center; margin-top: 20px;">
+    <button onclick="clearCart('{{cart._id}}')" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; margin-right: 10px; cursor: pointer; transition: background-color 0.3s;">
+      Vaciar Carrito
+    </button>
+    <button onclick="updateCart('{{cart._id}}')" style="background-color: #28a745; color: white; border: none; padding: 10px 20px; margin-right: 10px; cursor: pointer; transition: background-color 0.3s;">
+      Actualizar Carrito
+    </button>
+    <a href="/products" style="text-decoration: none; padding: 10px 20px; color: white; background-color: #007bff; border-radius: 5px; display: inline-block;">Ver Productos</a>
+  </div>
+</div>
+
+<script>
+  async function updateQuantity(cartId, productId, quantity) {
+  }
+
+  async function removeProduct(cartId, productId) {
+      try {
+          const response = await fetch(`/carts/${cartId}/products/${productId}`, {
+              method: 'DELETE',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+          });
+          
+          const result = await response.json();
+          if (response.ok) {
+              alert(result.message);
+              location.reload(); 
+          } else {
+              alert(result.message);
+          }
+      } catch (error) {
+          console.error('Error al eliminar el producto:', error);
+          alert('Error al eliminar el producto.');
+      }
+  }
+
+  async function clearCart(cartId) {
+    if (confirm("¿Estás seguro de que deseas vaciar el carrito?")) { 
+        try {
+            const response = await fetch(`/carts/${cartId}`, { 
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                location.reload(); 
+            } else {
+                alert(result.message); 
+            }
+        } catch (error) {
+            console.error('Error al vaciar el carrito:', error);
+            alert('Error al vaciar el carrito. Por favor intenta de nuevo.');
+        }
+    }
+}
+
+
+  async function updateCart(cartId) {
+      const products = Array.from(document.querySelectorAll('input[type="number"]')).map(input => ({
+          product_id: input.getAttribute('data-product-id'),
+          quantity: parseInt(input.value),
+      }));
+
+      if (products.some(product => !product.product_id || product.quantity <= 0)) {
+          alert('Cada producto debe tener un product_id y una cantidad válida.');
+          return;
+      }
+
+      try {
+          const response = await fetch(`/carts/${cartId}`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ products }),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+              alert(result.message);
+              location.reload(); 
+          } else {
+              alert(result.message);
+          }
+      } catch (error) {
+          console.error('Error al actualizar el carrito:', error);
+          alert('Error al actualizar el carrito.');
+      }
+  }
+</script>
